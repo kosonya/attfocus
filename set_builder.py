@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+
+import glob
+import random
+
+data_path = "../data/"
+door_range = 0, 28
+test_ratio = 0.2
+
+def read_by_door_id(door_id):
+	filename = glob.glob(data_path + str(door_id) + "-*.csv")[0]
+	f = open(filename, "r")
+	res = read_one_file(f)
+	f.close()
+	return res
+
+def read_one_file(f):
+	res = []
+	if data_path == "old_data/":
+		for line in f.readlines():
+			if not line:
+				break
+			for record in line.split('\r')[1:]:
+				d = map(float, record.split(','))
+				res.append(d)
+	else:
+		for line in f.readlines()[1:]:
+			if not line:
+				break
+			d = map(float, line.split(','))
+			res.append(d)
+	return res
+
+def build_x_y():
+	X = []
+	Y = []
+	for door in xrange(door_range[0], door_range[1]+1):
+		door_data = read_by_door_id(door)
+		X += door_data
+		Y += [door for _ in xrange(len(door_data))]
+	return X, Y
+
+def build_sets(X, Y):
+	training = [[], []]
+	test = [[], []]
+	for i in xrange(len(X)):
+		dst_set = training if random.uniform(0, 1) > test_ratio else test
+		dst_set[0].append(X[i])
+		dst_set[1].append(Y[i])
+	return training, test
+
+
+def write_sets(training, test):
+	f = open("training_set.py", "w")
+	f.write(str(training))
+	f.close()
+	f = open("test_set.py", "w")
+	f.write(str(test))
+	f.close()
+
+def main():
+	X, Y = build_x_y()
+	training, test = build_sets(X, Y)
+	write_sets(training, test)
+	
+if __name__ == "__main__":
+	main()	
