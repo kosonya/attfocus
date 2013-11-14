@@ -8,7 +8,7 @@ def nth_arr_from_sample(sample, n=4):
 	res = map(lambda x: reduce(lambda a, b: a*b, x, 1), itertools.combinations_with_replacement(sample, n))
 	return res
 
-def build_nth_x_from_set(arr_X, n = 5):
+def build_nth_x_from_set(arr_X, n = 4):
 	l = len(arr_X)
 	order = len(nth_arr_from_sample(arr_X[0], n))
 	print "Original features:", len(arr_X[0])
