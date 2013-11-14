@@ -1,0 +1,13 @@
+Polynomial order = 4
+test ratio = 0.2
+
+Loading data...
+len(X): 2616 len(X[0]): 13 len(Y): 2616
+Building features...
+Original features: 13
+Built features: 1820
+
+
+Average distance: 0.519567209813
+Success rate: 0.688455657492
+

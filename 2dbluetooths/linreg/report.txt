@@ -1,0 +1,15 @@
+Polynomial order = 5
+test_ratio = 0.2
+
+
+
+len(X): 2734 len(X[0]): 13 len(Y): 2734
+Building features...
+Original features: 13
+Built features: 6188
+
+
+
+Average distance: 0.523858013472
+Success rate: 0.67776152158
+
