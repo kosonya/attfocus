@@ -73,7 +73,7 @@ class NaiveHistRegNode(object):
 			feat = self.training_set[i]
 			if self.debug:
 				print "Calculating histogram {} of {}".format(i, l)
-			H, edges = numpy.histogramdd(feat, bins = (5, 8, 4), normed = True)
+			H, edges = numpy.histogramdd(feat, bins = (5, 8, 4), normed = False)
 			centers = map(posts_to_fence, edges)
 			grid = numpy.ix_(*centers)
 			if self.debug:
@@ -82,6 +82,7 @@ class NaiveHistRegNode(object):
 			lnode_X = None
 			lnode_Y = None
 			for y in xrange(H.shape[1]):
+				tmp_y = None
 				for z in xrange(H.shape[2]):
 					for x in xrange(H.shape[0]):
 						_x = centers[0][x]
@@ -96,12 +97,21 @@ class NaiveHistRegNode(object):
 						else:
 							lnode_X = numpy.vstack( (lnode_X, arr) )
 						arr = numpy.array([H[x, y, z]], dtype = self.dtype).reshape([1, 1])
-						if lnode_Y == None:
-							lnode_Y = arr
+						if tmp_y == None:
+							tmp_y = arr
 						else:
-							lnode_Y = numpy.vstack( (lnode_Y, arr) )
+							tmp_y = numpy.vstack( (tmp_y, arr) )
+
 					if self.debug:
 						print ""
+				tmp_y = tmp_y / numpy.max(tmp_y)
+				if self.debug:
+					print tmp_y
+				if lnode_Y == None:
+					lnode_Y = tmp_y
+				else:
+					lnode_Y = numpy.vstack( (lnode_Y, tmp_y) )
+
 			if self.debug:
 				print "X"
 				print lnode_X
@@ -128,7 +138,7 @@ class NaiveHistRegNode(object):
 		examples = in_arr.shape[0]
 		in_feats = in_arr.shape[1]
 		res = None
-
+		current_res = None
 		for example in xrange(examples):
 			max_pdf = 0.0
 			x = minx

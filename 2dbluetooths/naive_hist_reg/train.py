@@ -17,7 +17,7 @@ def main():
 	print "Loading data..."
 	X, Y = load_data("training_set.py")
 	print "len(X):", len(X), "len(X[0]):", len(X[0]), "len(Y):", len(Y)
-	hnode = naive_hist_reg_node.NaiveHistRegNode(debug = True)
+	hnode = naive_hist_reg_node.NaiveHistRegNode(debug = True, order = 3)
 	for i in xrange(len(X)):
 		x = numpy.array(X[i])
 		x = x.reshape([1, x.size])

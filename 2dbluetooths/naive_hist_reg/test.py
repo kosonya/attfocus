@@ -19,7 +19,7 @@ def main():
 	f = open("hnode.p", "rb")
 	hnode = pickle.load(f)
 	f.close()
-	hnode.debug = False
+	hnode.debug = True
 	print "len(X):", len(X), "len(X[0]):", len(X[0]), "len(Y):", len(Y)
 	Y = numpy.array(Y, dtype="float64")
 	print "Shape of Y:", Y.shape
