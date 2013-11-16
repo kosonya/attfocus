@@ -2,10 +2,8 @@
 
 import featurebuilder
 import pickle
-import mdp
-import math
 import numpy
-
+import gauss_node
 
 def load_data(filename):
 	src = open(filename, "r")
@@ -13,32 +11,29 @@ def load_data(filename):
 	src.close()
 	return X, Y
 
-def load_node(filename):
-	f = open(filename, "rb")
-	node = pickle.load(f)
-	f.close()
-	return node
 
 
 def main():
 	print "Loading data..."
 	X, Y = load_data("test_set.py")
-	node = load_node("node.p")
+	f = open("gnode.p", "rb")
+	gnode = pickle.load(f)
+	f.close()
+	gnode.debug = False
 	print "len(X):", len(X), "len(X[0]):", len(X[0]), "len(Y):", len(Y)
-	print "Building features..."
-	X = featurebuilder.build_nth_x_from_set(X)
-	print "Size of X:", X.shape
-	Y = featurebuilder.build_y(Y)
-	print "Size of Y:", Y.shape
+	Y = numpy.array(Y, dtype="float64")
+	print "Shape of Y:", Y.shape
+	X = numpy.array(X, dtype="float64")
+	print "Shape of X:", X.shape
 	dsum = 0
 	rights = 0
 	for i in xrange(X.shape[0]):
 		x = X[i]
 		x = x.reshape(1, x.size)
-		y_est = node.execute(x)
+		y_est = gnode.execute(x, minx = -1.0, maxx = 10.0, miny = -1.0, maxy = 10.0, step = 0.5)
 		y_true = Y[i]
 		d = y_true - y_est[0]
-		dist = math.sqrt(numpy.dot(d, d))
+		dist = numpy.sqrt(numpy.dot(d, d))
 		dsum += dist
 		y_est_r = numpy.round(y_est)
 		got_it_right = numpy.array_equal(y_true, y_est_r[0])

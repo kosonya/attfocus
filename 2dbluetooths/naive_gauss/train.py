@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-import featurebuilder
 import pickle
-import mdp
+import gauss_node
+import numpy
+
 
 
 def load_data(filename):
@@ -11,29 +12,32 @@ def load_data(filename):
 	src.close()
 	return X, Y
 
-def teach(X, Y):
-	node = mdp.nodes.LinearRegressionNode(use_pinv = True)
-	print "training"
-	node.train(X, Y)
-	print "stopping training"
-	node.stop_training()
-	return node
 
 def main():
 	print "Loading data..."
 	X, Y = load_data("training_set.py")
 	print "len(X):", len(X), "len(X[0]):", len(X[0]), "len(Y):", len(Y)
-	print "Building features..."
-	X = featurebuilder.build_nth_x_from_set(X)
-	print "Size of X:", X.shape
-	Y = featurebuilder.build_y(Y)
-	print "Size of Y:", Y.shape
-	print "Teaching node.."
-	node = teach(X, Y)
-	print "Writing node..."
-	f = open("node.p", "wb")
-	pickle.dump(node, f)
-	f.close()
+	gnode = gauss_node.NaiveGaussNode(debug = False)
+	for i in xrange(len(X)):
+		x = numpy.array(X[i])
+		x = x.reshape([1, x.size])
+		y = numpy.array(Y[i])
+		y = y.reshape([1, y.size])
+	#	print "x:", x, "y:", y
+		gnode.train(x, y)
+	#for row in xrange(gnode.training_set[0].shape[0]):
+	#	s = ""
+	#	for column in xrange(len(gnode.training_set)):
+	#		s += str(gnode.training_set[column][row]) + " "
+	#	print s
+	gnode.stop_training()
+	for i in xrange(len(gnode.covariances)):
+		print i, ":"
+		print "mean:", gnode.means[i]
+		print "covariance:"
+		print gnode.covariances[i]
+		print "\n"
+	gnode.save(filename = "gnode.p")
 
 if __name__ == "__main__":
 	main()

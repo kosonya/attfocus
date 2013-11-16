@@ -7,7 +7,7 @@ import random
 
 #data_path = "../data/"
 data_path =  "../data_1_foot_grid/"
-test_ratio = 0.5
+test_ratio = 0.05
 
 def read_by_locid(locid):
 	print "Reading locid:", locid
@@ -53,14 +53,9 @@ def build_sets(X, Y):
 	training = [[], []]
 	test = [[], []]
 	for i in xrange(len(X)):
-		feats = X[i]
-		_x, _y = Y[i]
-		if (_x%2 == 0 and _y%2 == 1) or (_x%2 == 1 and _y%2 ==0):
-			training[0].append(feats)
-			training[1].append([_x, _y])
-		else:
-			test[0].append(feats)
-			test[1].append([_x, _y])
+		dst_set = training if random.uniform(0, 1) > test_ratio else test
+		dst_set[0].append(X[i])
+		dst_set[1].append(Y[i])
 	return training, test
 
 
