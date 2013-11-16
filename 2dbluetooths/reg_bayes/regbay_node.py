@@ -16,6 +16,7 @@ def mul(seq):
 def build_feats(in_arr, order, debug = False):
 	res = None
 	i = 1
+	in_arr = numpy.hstack( (numpy.ones([in_arr.shape[0], 1]), in_arr) )
 	for feat in itertools.combinations_with_replacement(in_arr.T, r = order):
 		if debug:
 			print "Processing feature", i
@@ -26,6 +27,7 @@ def build_feats(in_arr, order, debug = False):
 			res = arr
 		else:
 			res = numpy.hstack( (res, arr) )
+	res = res[:,1:]
 	return res
 
 def pseudo_pdf(estimated_x, true_x):
