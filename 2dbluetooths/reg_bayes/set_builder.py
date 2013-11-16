@@ -7,7 +7,7 @@ import random
 
 #data_path = "../data/"
 data_path =  "../data_1_foot_grid/"
-test_ratio = 0.2
+test_ratio = 0.05
 
 def read_by_locid(locid):
 	print "Reading locid:", locid
@@ -45,7 +45,7 @@ def build_x_y():
 				else:
 					loc = str(_x) + str(_y)
 				data = read_by_locid(loc)
-				X += [x for x in data]
+				X += data
 				Y += [[_x, _y] for _ in xrange(len(data))]
 	return X, Y
 

@@ -36,7 +36,10 @@ def main():
 		print "mean:", gnode.means[i]
 		print "covariance:"
 		print gnode.covariances[i]
+		print "cov det:", numpy.linalg.det(gnode.covariances[i])
 		print "\n"
+	print "xy mean:", gnode.xy_mean
+	print "xy cov:", gnode.xy_covariance
 	gnode.save(filename = "gnode.p")
 
 if __name__ == "__main__":

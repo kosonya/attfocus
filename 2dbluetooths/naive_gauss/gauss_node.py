@@ -9,6 +9,9 @@ class NaiveGaussNode(object):
 		self.training_set = None
 		self.covariances = []
 		self.means = []
+		self.xy_covariance = []
+		self.xy_mean = []
+		self.xys = None
 		self.dtype = dtype
 		self.out_feats = 2
 		self.debug = debug
@@ -41,6 +44,10 @@ class NaiveGaussNode(object):
 					tmp_res.append(arr)
 			if self.training_set == None:
 				self.training_set = tmp_res
+			if self.xys == None:
+				self.xys = out_arr[example]
+			else:
+				self.xys = numpy.vstack( (self.xys, out_arr[example]) )
 
 	def stop_training(self, destroy_training_set = True):
 		l = len(self.training_set)
@@ -50,6 +57,8 @@ class NaiveGaussNode(object):
 				print "Calculating covariance and mean {} of {}".format(i, l)
 			self.covariances.append(numpy.cov(feat.T))
 			self.means.append(numpy.mean(feat, axis=0))
+		self.xy_covariance = numpy.cov(self.xys.T)
+		self.xy_mean = numpy.mean(self.xys, axis = 0)
 		self.training_set = None
 
 	#Currently only supports 2D output. I'll think of the general case later.
@@ -60,7 +69,11 @@ class NaiveGaussNode(object):
 		res = None
 		covdets = map(numpy.linalg.det, self.covariances)
 		covpinvs = map(numpy.linalg.pinv, self.covariances)
-		factor = 1e-14 * (2.0 * numpy.pi) ** (in_feats+2) 
+		factor =  (2.0 * numpy.pi) ** (in_feats+2)
+
+		xycovdet = numpy.linalg.det(self.xy_covariance)
+		xycovpinv = numpy.linalg.pinv(self.xy_covariance)
+		xyfactor = (2.0*numpy.pi) ** 2
 		for example in xrange(examples):
 			max_pdf = 0.0
 			x = minx
@@ -71,10 +84,18 @@ class NaiveGaussNode(object):
 					for in_feat in xrange(in_feats):
 						arr = numpy.hstack( (in_arr[example][in_feat], numpy.array([x, y], dtype=self.dtype) ) )
 						xmm = arr - self.means[in_feat]
-						pdf = numpy.exp(-0.5 * numpy.dot(numpy.dot(xmm.T, covpinvs[in_feat]), xmm))/(factor*covdets[in_feat])
+						pdf = numpy.exp(-0.5 * numpy.dot(numpy.dot(xmm.T, covpinvs[in_feat]), xmm))/numpy.sqrt(factor*covdets[in_feat])
 						current_total_pdf *= pdf
+
+
+					xyarr = numpy.array([x, y], dtype=self.dtype)
+					xyxmm = xyarr - self.xy_mean
+					xypdf = numpy.exp(-0.5 * numpy.dot(numpy.dot(xyxmm.T, xycovpinv), xyxmm))/numpy.sqrt(xyfactor * xycovdet)
+
+					current_total_pdf /= xypdf**(in_feats+2)
+
 					if self.debug:
-						print "x:", x, "y:", y, "pdf:", current_total_pdf, "max_pdf:", max_pdf
+						print "x:", x, "y:", y, "pdf:", current_total_pdf, "max_pdf:", max_pdf, "xypdf:", xypdf
 
 					if current_total_pdf > max_pdf:
 						current_res = [x, y]

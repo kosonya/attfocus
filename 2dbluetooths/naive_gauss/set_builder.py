@@ -7,7 +7,7 @@ import random
 
 #data_path = "../data/"
 data_path =  "../data_1_foot_grid/"
-test_ratio = 0.05
+test_ratio = 0.1
 
 def read_by_locid(locid):
 	print "Reading locid:", locid
